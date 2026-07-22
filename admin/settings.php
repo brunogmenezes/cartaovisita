@@ -602,8 +602,13 @@ previewFrame.addEventListener('load', () => {
   previewFrame.style.display = 'block';
   setStatus('ao vivo');
 });
+</script>
+<?php
+// Define featuredLinks dynamically before heredoc
+echo "<script>let featuredLinks = " . $s['featured_links'] . ";</script>";
+?>
+<script>
 // Featured Links management
-let featuredLinks = <?= $s['featured_links'] ?>;
 
 function renderFeaturedLinks() {
   const container = document.getElementById('links-list');
