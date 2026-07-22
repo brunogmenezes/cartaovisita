@@ -159,12 +159,7 @@ function h2(string $s): string { return htmlspecialchars($s, ENT_QUOTES|ENT_SUBS
             $f_emoji = $link['emoji'] ?? '🌙';
             if (!$f_url) continue;
         ?>
-        <a href="<?= h2($f_url) ?>"
-           class="featured-card" id="btn-featured-<?= $index ?>"
-           onclick="trackClick('featured_<?= $index ?>')"
-           target="_blank" rel="noopener noreferrer"
-           aria-label="<?= h2($f_title) ?>"
-           style="margin-bottom:0">
+        <div class="featured-card featured-lead-btn" style="cursor:pointer;margin-bottom:0;width:100%;border:none;text-align:left;background-color:transparent;padding:0;display:flex" data-url="<?= h2($f_url) ?>">
           <div class="featured-icon-wrap">
             <div class="featured-icon"><?= h2($f_emoji) ?></div>
           </div>
@@ -174,7 +169,7 @@ function h2(string $s): string { return htmlspecialchars($s, ENT_QUOTES|ENT_SUBS
             <span class="featured-link-label">Acessar guia →</span>
           </div>
           <div class="featured-glow"></div>
-        </a>
+        </div>
         <?php endforeach ?>
       </div>
     </section>

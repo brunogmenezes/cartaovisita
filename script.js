@@ -36,8 +36,12 @@ const errPhone   = document.getElementById('err-phone');
 const submitText = document.getElementById('submit-text');
 const submitLoad = document.getElementById('submit-loading');
 const waBtn      = document.getElementById('btn-whatsapp');
+let currentRedirectTarget = null; // null = whatsapp, otherwise URL string
+let currentTrackEvent = 'whatsapp';
 
-function openModal() {
+function openModal(redirectTarget = null, trackEvent = 'whatsapp') {
+  currentRedirectTarget = redirectTarget;
+  currentTrackEvent = trackEvent;
   overlay.classList.add('active');
   document.body.style.overflow = 'hidden';
   setTimeout(() => nameInput?.focus(), 400);
@@ -49,8 +53,16 @@ function closeModal() {
 }
 
 if (waBtn) {
-  waBtn.addEventListener('click', openModal);
+  waBtn.addEventListener('click', () => openModal(null, 'whatsapp'));
 }
+
+// Escuta todos os botões de link em destaque
+document.querySelectorAll('.featured-lead-btn').forEach((btn, idx) => {
+  btn.addEventListener('click', function() {
+    const targetUrl = this.getAttribute('data-url');
+    openModal(targetUrl, 'featured_' + idx);
+  });
+});
 
 if (closeBtn) {
   closeBtn.addEventListener('click', closeModal);
@@ -127,11 +139,21 @@ if (form) {
 
       const data = await res.json();
 
-      if (data.ok && data.whatsapp_url) {
+      if (data.ok) {
         closeModal();
         form.reset();
-        // Small delay so modal closes before opening WhatsApp
-        setTimeout(() => { window.open(data.whatsapp_url, '_blank'); }, 250);
+
+        // Rastrear clique do respectivo botão
+        trackClick(currentTrackEvent);
+
+        // Small delay so modal closes before opening the URL
+        setTimeout(() => {
+          if (currentRedirectTarget) {
+            window.open(currentRedirectTarget, '_blank');
+          } else if (data.whatsapp_url) {
+            window.open(data.whatsapp_url, '_blank');
+          }
+        }, 250);
       } else {
         showToast('❌ ' + (data.error || 'Erro ao processar. Tente novamente.'));
       }
