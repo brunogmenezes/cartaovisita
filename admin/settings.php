@@ -88,6 +88,8 @@ $google_fonts = [
 ];
 
 admin_page_start('Configurações', 'settings');
+// Declarar variável do JavaScript no topo para ser lida antes do fim da página
+echo "<script>let featuredLinks = " . $s['featured_links'] . ";</script>";
 ?>
 
 <div class="page-header">
@@ -603,10 +605,6 @@ previewFrame.addEventListener('load', () => {
   setStatus('ao vivo');
 });
 </script>
-<?php
-// Define featuredLinks dynamically before heredoc
-echo "<script>let featuredLinks = " . $s['featured_links'] . ";</script>";
-?>
 <script>
 // Featured Links management
 
