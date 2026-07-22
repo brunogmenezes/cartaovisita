@@ -159,7 +159,7 @@ function h2(string $s): string { return htmlspecialchars($s, ENT_QUOTES|ENT_SUBS
             $f_emoji = $link['emoji'] ?? '🌙';
             if (!$f_url) continue;
         ?>
-        <div class="featured-card featured-lead-btn" style="cursor:pointer;margin-bottom:0;width:100%;border:none;text-align:left;background-color:transparent;padding:0;display:flex" data-url="<?= h2($f_url) ?>">
+        <div class="featured-card featured-lead-btn" data-url="<?= h2($f_url) ?>">
           <div class="featured-icon-wrap">
             <div class="featured-icon"><?= h2($f_emoji) ?></div>
           </div>

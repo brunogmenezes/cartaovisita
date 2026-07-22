@@ -152,7 +152,7 @@ header('X-Frame-Options: SAMEORIGIN');
             $f_emoji = $link['emoji'] ?? '🌙';
             if (!$f_url) continue;
         ?>
-        <div class="featured-card" style="cursor:pointer;margin-bottom:0">
+        <div class="featured-card featured-lead-btn" data-url="<?= peh($f_url) ?>">
           <div class="featured-icon-wrap">
             <div class="featured-icon"><?= peh($f_emoji) ?></div>
           </div>
