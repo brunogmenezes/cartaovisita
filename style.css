@@ -597,10 +597,17 @@ body {
 }
 
 .featured-link-label {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--mint-light);
-  opacity: 0.85;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #69c5b0; /* Mint color with maximum brightness */
+  opacity: 1; /* Remove opacity to improve readability */
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition: var(--transition-fast);
+}
+.featured-card:hover .featured-link-label {
+  color: #fff;
+  text-decoration: underline;
 }
 
 /* ---------- Chips Grid ---------- */
