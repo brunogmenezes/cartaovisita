@@ -46,13 +46,31 @@ $chart_clicks = $db->query("
     ORDER BY total DESC
 ")->fetchAll();
 
-$cl_labels = json_encode(array_map(fn($r) => match($r['event_type']) {
-    'whatsapp'   => '💬 WhatsApp',
-    'phone'      => '📞 Telefone',
-    'instagram'  => '📸 Instagram',
-    'sleep_guide'=> '🌙 Guia Sono',
-    default      => $r['event_type'],
-}, $chart_clicks), JSON_UNESCAPED_UNICODE);
+// Carregar títulos reais dos links configurados para mapear no gráfico e tabela
+$feat_links_json = get_setting('featured_links', '[]');
+$feat_links_list = json_decode($feat_links_json, true) ?: [];
+
+$cl_labels_mapped = array_map(function($r) use ($feat_links_list) {
+    $evt = $r['event_type'];
+    if (strpos($evt, 'link_') === 0) {
+        $idx = (int)substr($evt, 5);
+        if (isset($feat_links_list[$idx])) {
+            $emoji = $feat_links_list[$idx]['emoji'] ?? '🔗';
+            $title = $feat_links_list[$idx]['title'] ?? ('Link ' . ($idx + 1));
+            return $emoji . ' ' . $title;
+        }
+        return '🔗 Link ' . ($idx + 1);
+    }
+    return match($evt) {
+        'whatsapp'   => '💬 WhatsApp',
+        'phone'      => '📞 Telefone',
+        'instagram'  => '📸 Instagram',
+        'sleep_guide'=> '🌙 Guia Sono',
+        default      => $evt,
+    };
+}, $chart_clicks);
+
+$cl_labels = json_encode($cl_labels_mapped, JSON_UNESCAPED_UNICODE);
 $cl_data   = json_encode(array_column($chart_clicks, 'total'));
 
 // ---- Recent leads ----
@@ -189,15 +207,25 @@ admin_page_start('Dashboard', 'dashboard', 'Tempo real');
           'instagram'   => 'badge-rose',
           'sleep_guide' => 'badge-amber',
       ];
-      $label_map = [
-          'whatsapp'    => '💬 WhatsApp',
-          'phone'       => '📞 Telefone',
-          'instagram'   => '📸 Instagram',
-          'sleep_guide' => '🌙 Guia Sono',
-      ];
       foreach ($recent_clicks as $click):
-          $badgeCls = $badge_map[$click['event_type']] ?? 'badge-lavender';
-          $label    = $label_map[$click['event_type']] ?? $click['event_type'];
+          $evt = $click['event_type'];
+          $badgeCls = $badge_map[$evt] ?? 'badge-amber';
+          
+          // Resolve nome dinâmico para os links em destaque
+          if (strpos($evt, 'link_') === 0) {
+              $idx = (int)substr($evt, 5);
+              $label = isset($feat_links_list[$idx]) 
+                  ? (($feat_links_list[$idx]['emoji'] ?? '🔗') . ' ' . ($feat_links_list[$idx]['title'] ?? 'Link'))
+                  : '🔗 Link ' . ($idx + 1);
+          } else {
+              $label_map = [
+                  'whatsapp'    => '💬 WhatsApp',
+                  'phone'       => '📞 Telefone',
+                  'instagram'   => '📸 Instagram',
+                  'sleep_guide' => '🌙 Guia Sono',
+              ];
+              $label = $label_map[$evt] ?? $evt;
+          }
       ?>
       <tr>
         <td><span class="badge <?= $badgeCls ?>"><?= $label ?></span></td>
