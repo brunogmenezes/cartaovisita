@@ -210,9 +210,9 @@ body {
 
 /* ---- Name & Title ---- */
 .hero-name {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: inherit;
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-dark);
   line-height: 1.15;
   margin-bottom: 12px;

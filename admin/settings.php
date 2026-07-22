@@ -69,7 +69,11 @@ foreach ($all_fields as $k) {
 $s['specialty_chips'] = get_setting('specialty_chips', '[]');
 $chips = json_decode($s['specialty_chips'], true) ?: [];
 
-$google_fonts = ['Nunito','Inter','Poppins','Roboto','Lato','Open Sans','Raleway','DM Sans','Outfit','Plus Jakarta Sans'];
+$google_fonts = [
+    'Nunito', 'Inter', 'Poppins', 'Roboto', 'Lato', 'Open Sans', 'Raleway', 'DM Sans', 
+    'Outfit', 'Plus Jakarta Sans', 'Playfair Display', 'Montserrat', 'Quicksand', 
+    'Comfortaa', 'Fredoka', 'Pacifico', 'Baloo 2', 'Sniglet', 'Mali'
+];
 
 admin_page_start('Configurações', 'settings');
 ?>
@@ -712,6 +716,16 @@ previewFrame.addEventListener('load', () => {
   padding: 16px; margin-top: 12px;
   border: 1px solid var(--border);
   transition: font-family .3s ease;
+}
+/* ---- Name & Title ---- */
+.hero-name {
+  font-family: inherit; /* Inherit global font changes */
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  line-height: 1.15;
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
 }
 .font-preview-title {
   font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 4px;
