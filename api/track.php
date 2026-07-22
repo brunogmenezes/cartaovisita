@@ -18,7 +18,10 @@ $type = trim($body['type'] ?? '');
 
 $allowed = ['pageview', 'whatsapp', 'phone', 'instagram', 'sleep_guide'];
 
-if (!in_array($type, $allowed, true)) {
+// Allow dynamically named featured links, e.g. "featured_0", "featured_1" etc.
+$is_featured = (strpos($type, 'featured_') === 0);
+
+if (!in_array($type, $allowed, true) && !$is_featured) {
     json_response(['ok' => false, 'error' => 'Invalid event type'], 400);
 }
 

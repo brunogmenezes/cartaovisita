@@ -9,9 +9,19 @@ $rqe     = get_setting('doctor_rqe',     'RQE 7335');
 $bio     = get_setting('doctor_bio',     'Pediatra dedicada ao cuidado integral da criança.');
 $wa      = get_setting('whatsapp_number','559984225102');
 $insta   = get_setting('instagram_handle','drabarbara.fernandes');
-$feat_url   = get_setting('featured_link_url',   'https://sono-do-bebe.netlify.app/');
-$feat_title = get_setting('featured_link_title', 'Quero entender melhor o sono do meu bebê');
-$feat_tag   = get_setting('featured_link_tag',   'Guia Gratuito');
+// Múltiplos links em destaque (carrega do DB em formato JSON)
+$featured_links_raw = get_setting('featured_links', '[]');
+$featured_links     = json_decode($featured_links_raw, true);
+
+// Se vazio, cai de volta para o padrão inicial
+if (empty($featured_links)) {
+    $featured_links = [[
+        'url'   => 'https://sono-do-bebe.netlify.app/',
+        'title' => 'Quero entender melhor o sono do meu bebê',
+        'tag'   => 'Guia Gratuito',
+        'emoji' => '🌙'
+    ]];
+}
 $photo   = get_setting('profile_photo', 'profile.png');
 $chips   = json_decode(get_setting('specialty_chips', '[]'), true) ?: [
     '👶 Neonatologia', '🧠 Desenvolvimento Infantil', '🥗 Nutrição Pediátrica',
@@ -137,25 +147,38 @@ function h2(string $s): string { return htmlspecialchars($s, ENT_QUOTES|ENT_SUBS
     </section>
 
     <!-- ===== FEATURED LINK ===== -->
+    <?php if (!empty($featured_links)): ?>
     <section class="section-block" aria-label="Conteúdo especial">
       <h2 class="section-label">Conteúdo Exclusivo</h2>
 
-      <a href="<?= h2($feat_url) ?>"
-         class="featured-card" id="btn-sleep-guide"
-         onclick="trackClick('sleep_guide')"
-         target="_blank" rel="noopener noreferrer"
-         aria-label="<?= h2($feat_title) ?>">
-        <div class="featured-icon-wrap">
-          <div class="featured-icon">🌙</div>
-        </div>
-        <div class="featured-content">
-          <span class="featured-tag"><?= h2($feat_tag) ?></span>
-          <h3 class="featured-title"><?= h2($feat_title) ?></h3>
-          <span class="featured-link-label">Acessar guia →</span>
-        </div>
-        <div class="featured-glow"></div>
-      </a>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <?php foreach ($featured_links as $index => $link):
+            $f_url   = $link['url'] ?? '';
+            $f_title = $link['title'] ?? '';
+            $f_tag   = $link['tag'] ?? 'Destaque';
+            $f_emoji = $link['emoji'] ?? '🌙';
+            if (!$f_url) continue;
+        ?>
+        <a href="<?= h2($f_url) ?>"
+           class="featured-card" id="btn-featured-<?= $index ?>"
+           onclick="trackClick('featured_<?= $index ?>')"
+           target="_blank" rel="noopener noreferrer"
+           aria-label="<?= h2($f_title) ?>"
+           style="margin-bottom:0">
+          <div class="featured-icon-wrap">
+            <div class="featured-icon"><?= h2($f_emoji) ?></div>
+          </div>
+          <div class="featured-content">
+            <span class="featured-tag"><?= h2($f_tag) ?></span>
+            <h3 class="featured-title"><?= h2($f_title) ?></h3>
+            <span class="featured-link-label">Acessar guia →</span>
+          </div>
+          <div class="featured-glow"></div>
+        </a>
+        <?php endforeach ?>
+      </div>
     </section>
+    <?php endif ?>
 
     <!-- ===== SPECIALTY CHIPS ===== -->
     <section class="section-block" aria-label="Especialidades">

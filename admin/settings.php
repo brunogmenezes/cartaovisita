@@ -11,7 +11,6 @@ $error   = '';
 $all_fields = [
     'doctor_name','doctor_title','doctor_crm','doctor_rqe','doctor_bio',
     'whatsapp_number','instagram_handle',
-    'featured_link_url','featured_link_title','featured_link_tag',
     // Visual
     'color_rose','color_lavender','color_mint',
     'color_bg_start','color_bg_mid','color_bg_end','color_text',
@@ -30,6 +29,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (is_array($arr)) {
                 $arr = array_values(array_filter(array_map('trim', $arr)));
                 set_setting('specialty_chips', json_encode($arr, JSON_UNESCAPED_UNICODE));
+            }
+        }
+        // Featured links: receive as JSON string from JS
+        if (isset($_POST['featured_links'])) {
+            $links_raw = $_POST['featured_links'];
+            $links_arr = json_decode($links_raw, true);
+            if (is_array($links_arr)) {
+                // Filter empty URLs
+                $links_arr = array_values(array_filter($links_arr, fn($l) => !empty(trim($l['url'] ?? ''))));
+                set_setting('featured_links', json_encode($links_arr, JSON_UNESCAPED_UNICODE));
             }
         }
         $success = 'Configurações salvas com sucesso!';
@@ -60,6 +69,7 @@ $def = [
     'font_family'         => 'Nunito',
     'font_size_base'      => '15',
     'specialty_chips'     => '[]',
+    'featured_links'      => '[]',
 ];
 
 $s = [];
@@ -67,7 +77,9 @@ foreach ($all_fields as $k) {
     $s[$k] = get_setting($k, $def[$k] ?? '');
 }
 $s['specialty_chips'] = get_setting('specialty_chips', '[]');
+$s['featured_links']  = get_setting('featured_links', '[]');
 $chips = json_decode($s['specialty_chips'], true) ?: [];
+$feat_links = json_decode($s['featured_links'], true) ?: [];
 
 $google_fonts = [
     'Nunito', 'Inter', 'Poppins', 'Roboto', 'Lato', 'Open Sans', 'Raleway', 'DM Sans', 
@@ -142,20 +154,31 @@ admin_page_start('Configurações', 'settings');
         </div>
       </div>
 
-      <!-- LINK EM DESTAQUE -->
+      <!-- LINKS EM DESTAQUE -->
       <div class="settings-card">
-        <h2 class="settings-card-title">🌙 Link em Destaque</h2>
-        <div class="form-group">
-          <label class="form-label" for="featured_link_tag">Rótulo (tag)</label>
-          <input class="form-input" type="text" id="featured_link_tag" name="featured_link_tag" value="<?= h($s['featured_link_tag']) ?>"/>
+        <h2 class="settings-card-title">🌙 Links em Destaque</h2>
+        <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:14px">Adicione links extras como guias, e-books, etc.</p>
+        
+        <input type="hidden" name="featured_links" id="links-json-input" value='<?= h($s['featured_links']) ?>'/>
+
+        <div id="links-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+          <!-- Populated by JS -->
         </div>
-        <div class="form-group">
-          <label class="form-label" for="featured_link_title">Título do link</label>
-          <input class="form-input" type="text" id="featured_link_title" name="featured_link_title" value="<?= h($s['featured_link_title']) ?>"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="featured_link_url">URL de destino</label>
-          <input class="form-input" type="url" id="featured_link_url" name="featured_link_url" value="<?= h($s['featured_link_url']) ?>"/>
+
+        <div style="border-top:1.5px solid var(--border);padding-top:14px;margin-top:10px">
+          <p style="font-size:.75rem;font-weight:700;color:var(--text);margin-bottom:10px">➕ Adicionar Novo Link:</p>
+          
+          <div style="display:grid;grid-template-columns:50px 1fr;gap:8px;margin-bottom:8px">
+            <input type="text" id="new-link-emoji" class="form-input" placeholder="🌙" value="🌙" style="text-align:center;font-size:1.1rem;padding:6px"/>
+            <input type="text" id="new-link-tag" class="form-input" placeholder="Tag (Ex: Ebook Grátis)" style="padding:6px"/>
+          </div>
+          
+          <input type="text" id="new-link-title" class="form-input" placeholder="Título do link" style="margin-bottom:8px;padding:6px"/>
+          <input type="url" id="new-link-url" class="form-input" placeholder="https://..." style="margin-bottom:8px;padding:6px"/>
+          
+          <button type="button" class="btn btn-ghost btn-sm" onclick="addFeaturedLink()" style="width:100%">
+            + Adicionar Link
+          </button>
         </div>
       </div>
 
@@ -579,6 +602,71 @@ previewFrame.addEventListener('load', () => {
   previewFrame.style.display = 'block';
   setStatus('ao vivo');
 });
+// Featured Links management
+let featuredLinks = <?= $s['featured_links'] ?>;
+
+function renderFeaturedLinks() {
+  const container = document.getElementById('links-list');
+  container.innerHTML = '';
+  
+  if (featuredLinks.length === 0) {
+    container.innerHTML = `<p style="font-size:.78rem;color:var(--text-muted);text-align:center;padding:10px;background:var(--surface2);border-radius:10px">Nenhum link em destaque cadastrado.</p>`;
+    return;
+  }
+
+  featuredLinks.forEach((link, index) => {
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex;align-items:center;gap:10px;background:var(--surface2);padding:10px;border-radius:10px;border:1px solid var(--border)';
+    div.innerHTML = `
+      <span style="font-size:1.2rem">${link.emoji || '🌙'}</span>
+      <div style="flex:1;min-width:0">
+        <p style="font-size:.78rem;font-weight:700;margin:0;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${link.title}</p>
+        <p style="font-size:.65rem;color:var(--text-muted);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${link.url}</p>
+      </div>
+      <button type="button" class="chip-remove" onclick="removeFeaturedLink(${index})" style="position:static;font-size:1.1rem">✕</button>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function updateFeaturedLinksInput() {
+  document.getElementById('links-json-input').value = JSON.stringify(featuredLinks);
+}
+
+function addFeaturedLink() {
+  const emoji = document.getElementById('new-link-emoji').value.trim() || '🌙';
+  const tag   = document.getElementById('new-link-tag').value.trim() || 'Destaque';
+  const title = document.getElementById('new-link-title').value.trim();
+  const url   = document.getElementById('new-link-url').value.trim();
+
+  if (!title || !url) {
+    alert('Por favor, informe pelo menos o Título e a URL.');
+    return;
+  }
+
+  featuredLinks.push({ emoji, tag, title, url });
+  renderFeaturedLinks();
+  updateFeaturedLinksInput();
+  
+  // Clean inputs
+  document.getElementById('new-link-tag').value = '';
+  document.getElementById('new-link-title').value = '';
+  document.getElementById('new-link-url').value = '';
+  document.getElementById('new-link-emoji').value = '🌙';
+
+  schedulePreview();
+}
+
+function removeFeaturedLink(index) {
+  featuredLinks.splice(index, 1);
+  renderFeaturedLinks();
+  updateFeaturedLinksInput();
+  schedulePreview();
+}
+
+// Init Links list
+renderFeaturedLinks();
+updateFeaturedLinksInput();
 </script>
 
 <style>

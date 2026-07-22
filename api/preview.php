@@ -18,9 +18,9 @@ $rqe          = pv('doctor_rqe',    'RQE 7335');
 $bio          = pv('doctor_bio',    '');
 $wa           = pv('whatsapp_number', '559984225102');
 $insta        = pv('instagram_handle', 'drabarbara.fernandes');
-$feat_url     = pv('featured_link_url',   'https://sono-do-bebe.netlify.app/');
-$feat_title   = pv('featured_link_title', 'Quero entender melhor o sono do meu bebê');
-$feat_tag     = pv('featured_link_tag',   'Guia Gratuito');
+// Múltiplos links em destaque (recebido via POST como JSON)
+$featured_links_raw = isset($_POST['featured_links']) ? $_POST['featured_links'] : get_setting('featured_links', '[]');
+$featured_links     = json_decode($featured_links_raw, true) ?: [];
 
 // Cores customizadas
 $c_rose       = pv('color_rose',       '#e8628a');
@@ -141,19 +141,29 @@ header('X-Frame-Options: SAMEORIGIN');
       </div>
     </section>
 
-    <?php if ($feat_url): ?>
+    <?php if (!empty($featured_links)): ?>
     <section class="section-block">
       <h2 class="section-label">Conteúdo Exclusivo</h2>
-      <div class="featured-card" style="cursor:pointer">
-        <div class="featured-icon-wrap">
-          <div class="featured-icon">🌙</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <?php foreach ($featured_links as $index => $link):
+            $f_url   = $link['url'] ?? '';
+            $f_title = $link['title'] ?? '';
+            $f_tag   = $link['tag'] ?? 'Destaque';
+            $f_emoji = $link['emoji'] ?? '🌙';
+            if (!$f_url) continue;
+        ?>
+        <div class="featured-card" style="cursor:pointer;margin-bottom:0">
+          <div class="featured-icon-wrap">
+            <div class="featured-icon"><?= peh($f_emoji) ?></div>
+          </div>
+          <div class="featured-content">
+            <span class="featured-tag"><?= peh($f_tag) ?></span>
+            <h3 class="featured-title"><?= peh($f_title) ?></h3>
+            <span class="featured-link-label">Acessar guia →</span>
+          </div>
+          <div class="featured-glow"></div>
         </div>
-        <div class="featured-content">
-          <span class="featured-tag"><?= peh($feat_tag) ?></span>
-          <h3 class="featured-title"><?= peh($feat_title) ?></h3>
-          <span class="featured-link-label">Acessar guia →</span>
-        </div>
-        <div class="featured-glow"></div>
+        <?php endforeach ?>
       </div>
     </section>
     <?php endif ?>
