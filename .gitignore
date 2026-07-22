@@ -1,0 +1,6 @@
+# Ignorar arquivo de configuração real com senhas
+includes/config.php
+
+# Ignorar arquivos de upload reais, mantendo apenas a pasta
+uploads/*
+!uploads/.gitkeep

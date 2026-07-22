@@ -1,0 +1,20 @@
+<?php
+// =============================================================================
+// CONFIGURAÇÕES DO CARTÃO VIRTUAL – ARQUIVO DE EXEMPLO
+// =============================================================================
+// Instruções:
+// 1. Renomeie ou copie este arquivo para "config.php" na mesma pasta.
+// 2. Preencha as credenciais abaixo correspondentes ao seu servidor.
+// =============================================================================
+
+define('DB_HOST',     'localhost');
+define('DB_PORT',     '5432');
+define('DB_NAME',     'drabarbarafernandes');   // nome do banco PostgreSQL
+define('DB_USER',     'postgres');               // usuário PostgreSQL
+define('DB_PASS',     'SUA_SENHA_AQUI');         // senha PostgreSQL
+
+define('ADMIN_SESSION_NAME', 'drabs_admin_sess');
+define('BASE_PATH',   '/drabarbarafernandes');   // caminho base do site no Apache. Ex: '/' se estiver na raiz.
+define('UPLOAD_DIR',  __DIR__ . '/../uploads/');
+define('UPLOAD_URL',  BASE_PATH . '/uploads/');
+define('MAX_UPLOAD_SIZE', 5 * 1024 * 1024);     // 5 MB
