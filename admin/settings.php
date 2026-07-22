@@ -365,8 +365,8 @@ admin_page_start('Configurações', 'settings');
 </div><!-- /settings-split -->
 
 <?php
-// Define BASE in a separate script block before heredoc
-echo "<script>const BASE = '/drabarbarafernandes';</script>";
+// Define BASE dynamically using the BASE_PATH constant from config.php
+echo "<script>const BASE = '" . BASE_PATH . "';</script>";
 
 admin_page_end(<<<'JSCRIPT'
 <script>
