@@ -56,11 +56,20 @@ if (waBtn) {
   waBtn.addEventListener('click', () => openModal(null, 'whatsapp'));
 }
 
+// Escuta o botão do Instagram
+const instaBtn = document.getElementById('btn-instagram');
+if (instaBtn) {
+  instaBtn.addEventListener('click', function() {
+    const targetUrl = this.getAttribute('data-url');
+    openModal(targetUrl, 'instagram');
+  });
+}
+
 // Escuta todos os botões de link em destaque
 document.querySelectorAll('.featured-lead-btn').forEach((btn, idx) => {
   btn.addEventListener('click', function() {
     const targetUrl = this.getAttribute('data-url');
-    openModal(targetUrl, 'featured_' + idx);
+    openModal(targetUrl, 'link_' + idx);
   });
 });
 
