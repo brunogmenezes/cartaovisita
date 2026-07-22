@@ -542,8 +542,38 @@ button { cursor: pointer; }
 }
 .chip-add-input:focus { border-color: var(--rose); }
 
+.menu-toggle-btn {
+  display: none;
+  font-size: 1.3rem;
+  background: none;
+  border: none;
+  color: var(--text);
+  padding: 8px;
+  border-radius: 6px;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 90;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.sidebar-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 /* ====== RESPONSIVE ====== */
 @media (max-width: 768px) {
+  .menu-toggle-btn { display: flex; }
+  .sidebar-backdrop { display: block; }
   .sidebar { transform: translateX(-100%); }
   .sidebar.open { transform: translateX(0); }
   .admin-main { margin-left: 0; }

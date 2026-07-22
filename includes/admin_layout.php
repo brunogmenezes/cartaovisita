@@ -55,7 +55,7 @@ function admin_header(string $title, string $badge = ''): string {
     $b = $badge ? "<span class='header-badge'>{$badge}</span>" : '';
     return "
     <header class='admin-header'>
-      <button class='btn btn-ghost btn-sm' onclick=\"document.getElementById('sidebar').classList.toggle('open')\" style='display:none' id='menu-toggle'>☰</button>
+      <button class='btn btn-ghost btn-sm menu-toggle-btn' onclick=\"toggleAdminSidebar()\" id='menu-toggle'>☰</button>
       <span class='header-title'>{$title}</span>
       {$b}
     </header>";
@@ -72,6 +72,7 @@ function admin_page_start(string $title, string $active, string $badge = ''): vo
   <link rel='stylesheet' href='" . BASE_PATH . "/admin/style.css'/>
 </head>
 <body>
+<div class='sidebar-backdrop' onclick='toggleAdminSidebar()' id='sidebar-backdrop'></div>
 " . admin_sidebar($active) . "
 <div class='admin-main'>
 " . admin_header($title, $badge) . "
@@ -79,5 +80,18 @@ function admin_page_start(string $title, string $active, string $badge = ''): vo
 }
 
 function admin_page_end(string $extra_js = ''): void {
-    echo "</div></div>{$extra_js}</body></html>";
+    echo "</div></div>
+    <script>
+      function toggleAdminSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        if (sidebar && backdrop) {
+          sidebar.classList.toggle('open');
+          backdrop.classList.toggle('active');
+        }
+      }
+    </script>
+    {$extra_js}
+    </body>
+    </html>";
 }
