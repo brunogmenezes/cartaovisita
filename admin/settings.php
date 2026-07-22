@@ -170,8 +170,19 @@ echo "<script>let featuredLinks = " . $s['featured_links'] . ";</script>";
         <div style="border-top:1.5px solid var(--border);padding-top:14px;margin-top:10px">
           <p style="font-size:.75rem;font-weight:700;color:var(--text);margin-bottom:10px">➕ Adicionar Novo Link:</p>
           
-          <div style="display:grid;grid-template-columns:50px 1fr;gap:8px;margin-bottom:8px">
-            <input type="text" id="new-link-emoji" class="form-input" placeholder="🌙" value="🌙" style="text-align:center;font-size:1.1rem;padding:6px"/>
+          <div style="margin-bottom:10px">
+            <p style="font-size:.7rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Escolha um Ícone:</p>
+            <div style="display:flex;flex-wrap:wrap;gap:5px;padding:8px;background:var(--surface2);border-radius:10px">
+              <?php
+              $link_emojis = ['🌙','📖','🏥','👶','🧒','🩺','🩹','🏥','⭐','🌟','🍼','🤱','🧠','❤️','💚','🌱','🍎','🥗','🥛','🤗','👪','📅','✅','⚕️','🌸','🎀','💫','🌈'];
+              foreach ($link_emojis as $e): ?>
+              <button type="button" class="emoji-btn" onclick="insertLinkEmoji('<?= $e ?>')" title="<?= $e ?>"><?= $e ?></button>
+              <?php endforeach ?>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:60px 1fr;gap:8px;margin-bottom:8px">
+            <input type="text" id="new-link-emoji" class="form-input" placeholder="🌙" value="🌙" style="text-align:center;font-size:1.1rem;padding:6px" readonly/>
             <input type="text" id="new-link-tag" class="form-input" placeholder="Tag (Ex: Ebook Grátis)" style="padding:6px"/>
           </div>
           
@@ -665,6 +676,12 @@ function removeFeaturedLink(index) {
   renderFeaturedLinks();
   updateFeaturedLinksInput();
   schedulePreview();
+}
+
+function insertLinkEmoji(emoji) {
+  document.getElementById('new-link-emoji').value = emoji;
+  event.currentTarget.classList.add('emoji-active');
+  setTimeout(()=>event.currentTarget.classList.remove('emoji-active'),400);
 }
 
 // Init Links list
